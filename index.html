@@ -11,9 +11,9 @@
             --border-color: #2a2a2a;
             --text-main: #ffffff;
             --text-sub: #888888;
-            --accent: #00ffcc; /* 霓虹青 */
-            --reveal: #ffcc00; /* 翻开橙 */
-            --danger: #d32f2f; /* 排除红 */
+            --accent: #00ffcc;
+            --reveal: #ffcc00;
+            --danger: #d32f2f;
         }
 
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
@@ -61,14 +61,14 @@
         .shape-library {
             display: grid;
             grid-template-columns: repeat(3, 1fr); 
-            gap: 8px;
+            gap: 10px;
         }
 
         .shape-card {
             border: 1px solid var(--border-color);
             background: var(--bg-color);
             border-radius: 10px;
-            padding: 14px 6px;
+            padding: 15px 6px;
             cursor: pointer;
             display: flex;
             flex-direction: column;
@@ -84,37 +84,17 @@
             box-shadow: 0 0 12px rgba(0, 255, 204, 0.2);
         }
 
-        /* 方向徽章 */
-        .dir-badge {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            background: var(--accent);
-            color: #000;
-            font-size: 11px;
-            font-weight: 900;
-            min-width: 20px;
-            height: 20px;
-            padding: 0 4px;
-            border-radius: 10px;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 0 8px rgba(0, 255, 204, 0.6);
-            z-index: 10;
-        }
-
         .shape-grid {
             display: grid;
             gap: 4px;
             justify-content: center;
-            margin: 0 auto 4px auto;
+            margin: 0 auto 6px auto;
             width: fit-content;
         }
 
         .shape-cell { 
-            width: 14px; 
-            height: 14px; 
+            width: 16px; 
+            height: 16px; 
             background: transparent; 
             border-radius: 3px; 
         }
@@ -123,40 +103,31 @@
         .shape-label { font-size: 12px; font-weight: 700; color: var(--text-sub); }
         .shape-card.active .shape-label { color: var(--accent); }
 
-        /* 全局方向控制面板 */
-        .global-dir-panel {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-
-        .global-dir-btn {
-            flex: 1;
-            background: #222;
-            color: #fff;
-            border: 1px solid #444;
-            border-radius: 8px;
-            font-size: 14px;
-            padding: 12px 0;
-            cursor: pointer;
-            text-align: center;
-            transition: 0.2s;
-            display: flex;
+        /* 卡片右上角的方向角标 */
+        .dir-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: #333;
+            color: #aaa;
+            font-size: 11px;
+            font-weight: 900;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 6px;
+            border-radius: 11px;
+            display: none;
             justify-content: center;
             align-items: center;
-            user-select: none;
+            z-index: 10;
+            transition: 0.2s;
         }
 
-        .global-dir-btn.active {
+        .shape-card.active .dir-badge {
+            display: flex;
             background: var(--accent);
             color: #000;
-            border-color: var(--accent);
-            font-weight: 900;
-            box-shadow: 0 0 12px rgba(0, 255, 204, 0.3);
-        }
-
-        .global-dir-btn:active {
-            transform: scale(0.95);
+            box-shadow: 0 0 8px rgba(0, 255, 204, 0.6);
         }
 
         /* 模式切换 */
@@ -224,7 +195,64 @@
         .shape-card:active { transform: scale(0.95); }
         .grid-cell:active { transform: scale(0.9); }
 
-        /* 弹窗 */
+        /* 底部弹出抽屉 */
+        .sheet-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: flex-end;
+            z-index: 1000;
+        }
+        
+        .bottom-sheet {
+            background: var(--panel-bg); width: 100%; max-width: 420px;
+            border-radius: 20px 20px 0 0; padding: 20px;
+            border-top: 1px solid var(--border-color);
+            animation: slideUp 0.2s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .bottom-sheet h3 {
+            margin: 0 0 15px 0; text-align: center; font-size: 15px; color: var(--text-main);
+        }
+        
+        .bottom-sheet h3 span { color: var(--accent); }
+
+        .sheet-dir-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 12px;
+        }
+
+        .sheet-dir-btn {
+            background: #222; color: #fff; border: 1px solid #444; border-radius: 10px;
+            padding: 16px 0; font-size: 15px; font-weight: bold; cursor: pointer;
+            text-align: center; transition: 0.2s;
+        }
+
+        .sheet-dir-btn.active {
+            background: var(--accent); color: #000; border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+        }
+
+        .sheet-dir-btn:active { transform: scale(0.95); }
+
+        .sheet-cancel-btn {
+            padding: 14px; width: 100%; background: transparent;
+            color: var(--danger); border: 1px solid var(--danger);
+            border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer;
+            transition: 0.2s; margin-bottom: 8px;
+        }
+        
+        .sheet-cancel-btn:active { background: rgba(211, 47, 47, 0.2); }
+
+        .sheet-close-btn {
+            padding: 14px; width: 100%; background: transparent;
+            color: var(--text-sub); border: 1px solid var(--border-color);
+            border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer;
+        }
+        
+        /* 说明弹窗 */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center;
@@ -233,11 +261,10 @@
         .modal-content {
             background: var(--panel-bg); border: 1px solid var(--border-color);
             border-radius: 12px; padding: 20px; width: 100%; max-width: 320px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         .modal-content h2 { margin-top: 0; color: var(--accent); font-size: 18px; margin-bottom: 12px; }
         .modal-content ul { padding-left: 20px; font-size: 13px; color: #ccc; line-height: 1.6; margin-bottom: 20px; }
-        .modal-content li { margin-bottom: 6px; }
+        .modal-content li { margin-bottom: 8px; }
         .modal-content .close-btn {
             width: 100%; padding: 12px; background: var(--accent); color: #000;
             border: none; border-radius: 8px; font-weight: 800; font-size: 14px; cursor: pointer;
@@ -251,17 +278,8 @@
         <h1>藏宝</h1>
     </div>
     
-    <div class="section-title">图形库 (点击选择)</div>
+    <div class="section-title">图形库</div>
     <div class="shape-library" id="shapeLibrary"></div>
-
-    <div class="section-title">全局方向选择</div>
-    <div class="global-dir-panel" id="globalDirPanel">
-        <div class="global-dir-btn active" data-dir="up">向上</div>
-        <div class="global-dir-btn" data-dir="down">向下</div>
-        <div class="global-dir-btn" data-dir="left">向左</div>
-        <div class="global-dir-btn" data-dir="right">向右</div>
-        <div class="global-dir-btn" data-dir="random">随机</div>
-    </div>
 
     <div class="section-title">覆盖频次 · 点击标记</div>
     <div class="mode-buttons">
@@ -286,15 +304,31 @@
     </div>
 </div>
 
-<!-- 说明弹窗 -->
+<!-- 底部抽屉 -->
+<div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet(event)">
+    <div class="bottom-sheet" onclick="event.stopPropagation()">
+        <h3>选择 <span id="sheetShapeName">IV</span> 的方向</h3>
+        <div class="sheet-dir-grid" id="sheetDirGrid">
+            <div class="sheet-dir-btn" data-dir="up">向上</div>
+            <div class="sheet-dir-btn" data-dir="down">向下</div>
+            <div class="sheet-dir-btn" data-dir="left">向左</div>
+            <div class="sheet-dir-btn" data-dir="right">向右</div>
+            <div class="sheet-dir-btn" data-dir="random">随机</div>
+        </div>
+        <button class="sheet-cancel-btn" id="btnDeselect">取消选择</button>
+        <button class="sheet-close-btn" onclick="closeSheet()">取消</button>
+    </div>
+</div>
+
+<!-- 使用说明弹窗 -->
 <div class="modal-overlay" id="helpModal">
     <div class="modal-content">
         <h2>📖 使用说明</h2>
         <ul>
-            <li><b>1. 选方向：</b>先点击下方方向按钮锁定方向。</li>
-            <li><b>2. 选图形：</b>再点击上方图形卡片，图形会自动应用锁定的方向。</li>
-            <li><b>3. 标约束：</b>选“翻开”标记必须覆盖的区域；选“排除”标记绝不能碰的区域。</li>
-            <li><b>4. 看结果：</b>格子数字代表覆盖频次。</li>
+            <li><b>1. 选图形：</b>点击图形卡片选中，再次点击可修改方向或取消选择。</li>
+            <li><b>2. 选方向：</b>点第二次卡片会弹出方向选择，包含向上、向下、向左、向右、随机。</li>
+            <li><b>3. 标约束：</b>“翻开”指游戏里开出的正确格子（必须覆盖）；“排除”指游戏里开出的错误格子（禁止触碰）。</li>
+            <li><b>4. 看结果：</b>格子数字代表被覆盖的频次，数字越大代表该格是正确格的概率越高。</li>
         </ul>
         <button class="close-btn" onclick="toggleModal()">我知道了</button>
     </div>
@@ -302,30 +336,17 @@
 
 <script>
     const baseShapes = {
-        'IV':   [[1,1,0,1],
-                 [1,0,1,0]], 
-        'L':    [[1,0],
-                 [1,0],
-                 [1,0],
-                 [1,1]],
-        '折线': [[1,0,0],
-                 [1,0,0],
-                 [1,1,1]],
-        'P':    [[1,1],
-                 [1,1],
-                 [1,0]],
-        'T':    [[1,1,1],
-                 [0,1,0],
-                 [0,1,0]],
-        'U':    [[1,0,1],
-                 [1,1,1]]
+        'IV':   [[1,1,0,1],[1,0,1,0]], 
+        'L':    [[1,0],[1,0],[1,0],[1,1]],
+        '折线': [[1,0,0],[1,0,0],[1,1,1]],
+        'P':    [[1,1],[1,1],[1,0]],
+        'T':    [[1,1,1],[0,1,0],[0,1,0]],
+        'U':    [[1,0,1],[1,1,1]]
     };
 
     const shapeRotations = {};
     for (const [key, matrix] of Object.entries(baseShapes)) {
-        let rotations = [];
-        let current = matrix;
-        let seen = new Set();
+        let rotations = [], current = matrix, seen = new Set();
         for (let i = 0; i < 4; i++) {
             const str = JSON.stringify(current);
             if (!seen.has(str)) { seen.add(str); rotations.push(current); }
@@ -335,26 +356,22 @@
     }
 
     function rotateMatrix(matrix) {
-        const rows = matrix.length;
-        const cols = matrix[0].length;
+        const rows = matrix.length, cols = matrix[0].length;
         const rotated = Array(cols).fill().map(() => Array(rows).fill(0));
-        for (let y = 0; y < rows; y++) {
-            for (let x = 0; x < cols; x++) {
-                rotated[x][rows - 1 - y] = matrix[y][x];
-            }
-        }
+        for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) rotated[x][rows - 1 - y] = matrix[y][x];
         return rotated;
     }
 
-    let currentGlobalDirection = 'up'; 
     let selectedShapes = new Map(); 
     let currentMode = 'reveal'; 
     let gridState = Array(5).fill().map(() => Array(5).fill(0));
     let coverageCounts = Array(5).fill().map(() => Array(5).fill(0));
+    let currentEditingKey = null; 
 
     const dirSymbols = { 'up': '上', 'down': '下', 'left': '左', 'right': '右', 'random': '随' };
     const dirNames = { 'up': '向上', 'down': '向下', 'left': '向左', 'right': '向右', 'random': '随机' };
 
+    // 初始化图形库
     const shapeLibraryEl = document.getElementById('shapeLibrary');
     for (const [key, matrix] of Object.entries(baseShapes)) {
         const card = document.createElement('div');
@@ -363,8 +380,7 @@
 
         const badge = document.createElement('div');
         badge.className = 'dir-badge';
-        badge.textContent = '上';
-        
+
         const gridDiv = document.createElement('div');
         gridDiv.className = 'shape-grid';
         renderShapePreview(gridDiv, matrix);
@@ -377,15 +393,9 @@
         card.appendChild(gridDiv);
         card.appendChild(label);
         
-        card.onclick = () => toggleShape(key);
+        card.onclick = () => handleCardClick(key, card, gridDiv);
         shapeLibraryEl.appendChild(card);
     }
-
-    document.getElementById('globalDirPanel').addEventListener('click', (e) => {
-        const btn = e.target.closest('.global-dir-btn');
-        if (!btn) return;
-        applyGlobalDirection(btn.dataset.dir);
-    });
 
     function renderShapePreview(container, matrix) {
         container.innerHTML = '';
@@ -405,61 +415,83 @@
         if (dir === 'right') idx = 1;
         else if (dir === 'down') idx = 2;
         else if (dir === 'left') idx = 3;
-        idx = idx % rotations.length; 
-        return rotations[idx];
+        return rotations[idx % rotations.length];
     }
 
-    function toggleShape(key) {
+    // 【核心修改】卡片点击逻辑（默认随机）
+    function handleCardClick(key, cardElement, gridDiv) {
         if (selectedShapes.has(key)) {
-            selectedShapes.delete(key);
+            openSheet(key); // 已经是选中状态，第二次点击 -> 弹出方向面板
         } else {
-            selectedShapes.set(key, currentGlobalDirection);
-        }
-        syncShapeCards();
-        updateStatus();
-        calculateSolutions();
-    }
-
-    function applyGlobalDirection(dir) {
-        currentGlobalDirection = dir;
-
-        document.querySelectorAll('.global-dir-btn').forEach(btn => {
-            if (btn.dataset.dir === dir) btn.classList.add('active');
-            else btn.classList.remove('active');
-        });
-
-        if (selectedShapes.size > 0) {
-            for (let key of selectedShapes.keys()) {
-                selectedShapes.set(key, dir);
-            }
-            syncShapeCards();
+            // 第一次点击 -> 选中并默认随机，不弹窗
+            selectedShapes.set(key, 'random');
+            cardElement.classList.add('active');
+            cardElement.querySelector('.dir-badge').textContent = '随';
+            renderShapePreview(gridDiv, baseShapes[key]); // 随机方向显示默认形状
             updateStatus();
             calculateSolutions();
         }
     }
 
-    function syncShapeCards() {
-        document.querySelectorAll('.shape-card').forEach(card => {
-            const key = card.dataset.shape;
-            const gridDiv = card.querySelector('.shape-grid');
-            const badge = card.querySelector('.dir-badge');
-            
-            if (selectedShapes.has(key)) {
-                card.classList.add('active');
-                const dir = selectedShapes.get(key);
-                badge.textContent = dirSymbols[dir];
-                badge.style.display = 'flex';
-                
-                let previewMatrix = (dir === 'random') ? baseShapes[key] : getRotationMatrix(key, dir);
-                renderShapePreview(gridDiv, previewMatrix);
-            } else {
-                card.classList.remove('active');
-                badge.style.display = 'none';
-                renderShapePreview(gridDiv, baseShapes[key]);
-            }
+    function openSheet(key) {
+        currentEditingKey = key;
+        document.getElementById('sheetShapeName').textContent = key;
+        
+        const currentDir = selectedShapes.get(key) || 'random';
+        document.querySelectorAll('.sheet-dir-btn').forEach(btn => {
+            if (btn.dataset.dir === currentDir) btn.classList.add('active');
+            else btn.classList.remove('active');
         });
+
+        document.getElementById('sheetOverlay').style.display = 'flex';
     }
 
+    function closeSheet(e) {
+        if (e && e.target !== document.getElementById('sheetOverlay')) return;
+        document.getElementById('sheetOverlay').style.display = 'none';
+        currentEditingKey = null;
+    }
+
+    // 底部弹窗方向按钮点击
+    document.getElementById('sheetDirGrid').addEventListener('click', (e) => {
+        const btn = e.target.closest('.sheet-dir-btn');
+        if (!btn || !currentEditingKey) return;
+        const dir = btn.dataset.dir;
+        const key = currentEditingKey;
+        
+        selectedShapes.set(key, dir);
+        
+        const card = document.querySelector(`.shape-card[data-shape="${key}"]`);
+        const badge = card.querySelector('.dir-badge');
+        const gridDiv = card.querySelector('.shape-grid');
+        
+        badge.textContent = dirSymbols[dir];
+        
+        let previewMatrix = (dir === 'random') ? baseShapes[key] : getRotationMatrix(key, dir);
+        renderShapePreview(gridDiv, previewMatrix);
+
+        closeSheet();
+        updateStatus();
+        calculateSolutions();
+    });
+
+    // 取消选择按钮点击事件
+    document.getElementById('btnDeselect').addEventListener('click', () => {
+        if (!currentEditingKey) return;
+        const key = currentEditingKey;
+        selectedShapes.delete(key);
+        
+        const card = document.querySelector(`.shape-card[data-shape="${key}"]`);
+        card.classList.remove('active');
+        const gridDiv = card.querySelector('.shape-grid');
+        renderShapePreview(gridDiv, baseShapes[key]); 
+
+        closeSheet();
+        updateStatus();
+        calculateSolutions();
+    });
+
+    // 初始化主网格
     const mainGridEl = document.getElementById('mainGrid');
     for (let y = 0; y < 5; y++) {
         for (let x = 0; x < 5; x++) {
@@ -510,18 +542,14 @@
                 const matrices = (dir === 'random') ? shapeRotations[key] : [getRotationMatrix(key, dir)];
                 
                 for (const matrix of matrices) {
-                    const h = matrix.length;
-                    const w = matrix[0].length;
-                    
+                    const h = matrix.length, w = matrix[0].length;
                     for (let y = 0; y <= 5 - h; y++) {
                         for (let x = 0; x <= 5 - w; x++) {
                             if (isPlacementValidSingle(matrix, x, y, globalRevealCount)) {
                                 totalSolutions++;
                                 for (let dy = 0; dy < h; dy++) {
                                     for (let dx = 0; dx < w; dx++) {
-                                        if (matrix[dy][dx] === 1) {
-                                            coverageCounts[y + dy][x + dx]++;
-                                        }
+                                        if (matrix[dy][dx] === 1) coverageCounts[y + dy][x + dx]++;
                                     }
                                 }
                             }
@@ -537,23 +565,17 @@
 
     function isPlacementValidSingle(matrix, ox, oy, globalRevealCount) {
         let currentRevealCount = 0;
-        
         for (let y = 0; y < matrix.length; y++) {
             for (let x = 0; x < matrix[y].length; x++) {
                 if (matrix[y][x] === 1) {
-                    const gridX = ox + x;
-                    const gridY = oy + y;
-                    
+                    const gridX = ox + x, gridY = oy + y;
                     if (gridX >= 5 || gridY >= 5) return false;
                     if (gridState[gridY][gridX] === 2) return false;
                     if (gridState[gridY][gridX] === 1) currentRevealCount++;
                 }
             }
         }
-        
-        if (globalRevealCount > 0 && currentRevealCount !== globalRevealCount) {
-            return false;
-        }
+        if (globalRevealCount > 0 && currentRevealCount !== globalRevealCount) return false;
         return true;
     }
 
@@ -561,9 +583,7 @@
         for (let y = 0; y < 5; y++) {
             for (let x = 0; x < 5; x++) {
                 const cell = document.getElementById(`cell-${x}-${y}`);
-                const count = coverageCounts[y][x];
-                const state = gridState[y][x];
-                
+                const count = coverageCounts[y][x], state = gridState[y][x];
                 cell.className = 'grid-cell';
                 cell.textContent = ''; 
                 cell.style.color = ''; 
@@ -588,6 +608,7 @@
         }
     }
 
+    // 说明弹窗开关
     function toggleModal() {
         const modal = document.getElementById('helpModal');
         modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
@@ -597,12 +618,10 @@
         gridState = Array(5).fill().map(() => Array(5).fill(0));
         coverageCounts = Array(5).fill().map(() => Array(5).fill(0));
         selectedShapes.clear();
+        closeSheet();
         
-        applyGlobalDirection('up');
-
         document.querySelectorAll('.shape-card').forEach(card => {
             card.classList.remove('active');
-            card.querySelector('.dir-badge').style.display = 'none';
             const key = card.dataset.shape;
             const gridDiv = card.querySelector('.shape-grid');
             renderShapePreview(gridDiv, baseShapes[key]);
