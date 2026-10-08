@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>藏宝辅助工具</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --panel-bg: #141414;
+            --border-color: #2a2a2a;
+            --text-main: #ffffff;
+            --text-sub: #888888;
+            --accent: #00ffcc; /* 霓虹青 */
+            --reveal: #ffcc00; /* 翻开橙 */
+            --danger: #d32f2f; /* 排除红 */
+        }
+
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background-color: var(--panel-bg);
+            border-radius: 16px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 16px; margin: 0; letter-spacing: 2px; font-weight: 900;
+            background: var(--text-main); color: var(--bg-color);
+            padding: 4px 10px; border-radius: 4px;
+        }
+
+        .section-title { font-size: 12px; font-weight: 600; margin: 15px 0 10px 0; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* 图形库 */
+        .shape-library {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 8px;
+        }
+
+        .shape-card {
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            border-radius: 10px;
+            padding: 14px 6px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .shape-card.active {
+            border-color: var(--accent);
+            background: #1a2a2a;
+            box-shadow: 0 0 12px rgba(0, 255, 204, 0.2);
+        }
+
+        /* 方向徽章 */
+        .dir-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: var(--accent);
+            color: #000;
+            font-size: 11px;
+            font-weight: 900;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 4px;
+            border-radius: 10px;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 8px rgba(0, 255, 204, 0.6);
+            z-index: 10;
+        }
+
+        .shape-grid {
+            display: grid;
+            gap: 4px;
+            justify-content: center;
+            margin: 0 auto 4px auto;
+            width: fit-content;
+        }
+
+        .shape-cell { 
+            width: 14px; 
+            height: 14px; 
+            background: transparent; 
+            border-radius: 3px; 
+        }
+
+        .shape-cell.filled { background: var(--accent); box-shadow: 0 0 4px rgba(0,255,204,0.5); }
+        .shape-label { font-size: 12px; font-weight: 700; color: var(--text-sub); }
+        .shape-card.active .shape-label { color: var(--accent); }
+
+        /* 全局方向控制面板 */
+        .global-dir-panel {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .global-dir-btn {
+            flex: 1;
+            background: #222;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 8px;
+            font-size: 14px;
+            padding: 12px 0;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+        }
+
+        .global-dir-btn.active {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+            font-weight: 900;
+            box-shadow: 0 0 12px rgba(0, 255, 204, 0.3);
+        }
+
+        .global-dir-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 模式切换 */
+        .mode-buttons { display: flex; gap: 10px; margin-bottom: 15px; }
+        .mode-btn {
+            flex: 1; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 14px;
+            cursor: pointer; text-align: center; transition: all 0.2s ease;
+            border: 1px solid var(--border-color); background: transparent; color: var(--text-sub);
+        }
+        .mode-btn.active { background: var(--text-main); color: var(--bg-color); border-color: var(--text-main); }
+
+        /* 主网格 */
+        .main-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 15px;
+            padding: 6px; background: #000; border-radius: 12px; border: 1px solid var(--border-color);
+        }
+
+        .grid-cell {
+            aspect-ratio: 1; border-radius: 6px; display: flex; justify-content: center; align-items: center;
+            font-size: 16px; cursor: pointer; user-select: none; transition: all 0.2s ease;
+            background: #1a1a1a; border: 1px solid #222; position: relative;
+            font-weight: 800;
+        }
+
+        .grid-cell.reveal {
+            background: var(--reveal) !important; border-color: #ffaa00 !important;
+            color: #000 !important; font-size: 18px; font-weight: 900;
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.4);
+        }
+
+        .grid-cell.exclude {
+            background: var(--danger) !important; border-color: #ff5252 !important;
+            color: #fff !important; font-size: 18px; font-weight: 900;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .grid-cell.bg-freq-1 { background: #1a1a1a; color: #666; }
+        .grid-cell.bg-freq-2 { background: #222222; color: #888; }
+        .grid-cell.bg-freq-3 { background: #333333; color: #aaa; }
+        .grid-cell.bg-freq-4 { background: #444444; color: #ccc; }
+        .grid-cell.bg-freq-5 { background: #666666; color: #fff; }
+        .grid-cell.bg-freq-6 { background: #999999; color: #000; }
+        .grid-cell.bg-freq-7 { background: #cccccc; color: #000; }
+        .grid-cell.bg-freq-8 { 
+            background: var(--accent); color: #000; border-color: var(--accent);
+            box-shadow: 0 0 12px rgba(0,255,204,0.5); font-size: 18px;
+        }
+
+        .status-area { font-size: 12px; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+        .status-box {
+            border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 10px;
+            font-weight: 600; color: var(--text-sub); background: var(--bg-color);
+        }
+        .status-box span { color: var(--text-main); font-weight: 800; }
+        .full-width { width: 100%; margin-bottom: 15px; text-align: center; }
+
+        .action-buttons { display: flex; gap: 10px; }
+        .action-btn {
+            flex: 1; padding: 14px; border-radius: 8px; font-weight: 800; cursor: pointer;
+            text-align: center; font-size: 14px; transition: all 0.2s ease; border: 1px solid transparent;
+        }
+        .action-btn.primary { background: var(--text-main); color: var(--bg-color); }
+        .action-btn.secondary { background: transparent; color: var(--text-main); border-color: var(--border-color); }
+        .action-btn:active { transform: scale(0.98); }
+        .shape-card:active { transform: scale(0.95); }
+        .grid-cell:active { transform: scale(0.9); }
+
+        /* 弹窗 */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center;
+            z-index: 1000; padding: 20px;
+        }
+        .modal-content {
+            background: var(--panel-bg); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 20px; width: 100%; max-width: 320px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .modal-content h2 { margin-top: 0; color: var(--accent); font-size: 18px; margin-bottom: 12px; }
+        .modal-content ul { padding-left: 20px; font-size: 13px; color: #ccc; line-height: 1.6; margin-bottom: 20px; }
+        .modal-content li { margin-bottom: 6px; }
+        .modal-content .close-btn {
+            width: 100%; padding: 12px; background: var(--accent); color: #000;
+            border: none; border-radius: 8px; font-weight: 800; font-size: 14px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>藏宝</h1>
+    </div>
+    
+    <div class="section-title">图形库 (点击选择)</div>
+    <div class="shape-library" id="shapeLibrary"></div>
+
+    <div class="section-title">全局方向选择</div>
+    <div class="global-dir-panel" id="globalDirPanel">
+        <div class="global-dir-btn active" data-dir="up">向上</div>
+        <div class="global-dir-btn" data-dir="down">向下</div>
+        <div class="global-dir-btn" data-dir="left">向左</div>
+        <div class="global-dir-btn" data-dir="right">向右</div>
+        <div class="global-dir-btn" data-dir="random">随机</div>
+    </div>
+
+    <div class="section-title">覆盖频次 · 点击标记</div>
+    <div class="mode-buttons">
+        <div class="mode-btn active" id="btnReveal" onclick="setMode('reveal')">翻开</div>
+        <div class="mode-btn" id="btnExclude" onclick="setMode('exclude')">排除</div>
+    </div>
+
+    <div class="main-grid" id="mainGrid"></div>
+
+    <div class="status-area">
+        <div class="status-box">选中: <span id="statusShapes">无</span></div>
+        <div class="status-box">翻开: <span id="statusReveal">0</span> 格</div>
+    </div>
+    
+    <div class="status-box full-width">
+        总合法摆法: <span id="totalSolutions">—</span>
+    </div>
+
+    <div class="action-buttons">
+        <div class="action-btn primary" onclick="clearAll()">清空数据</div>
+        <div class="action-btn secondary" onclick="toggleModal()">使用说明</div>
+    </div>
+</div>
+
+<!-- 说明弹窗 -->
+<div class="modal-overlay" id="helpModal">
+    <div class="modal-content">
+        <h2>📖 使用说明</h2>
+        <ul>
+            <li><b>1. 选方向：</b>先点击下方方向按钮锁定方向。</li>
+            <li><b>2. 选图形：</b>再点击上方图形卡片，图形会自动应用锁定的方向。</li>
+            <li><b>3. 标约束：</b>选“翻开”标记必须覆盖的区域；选“排除”标记绝不能碰的区域。</li>
+            <li><b>4. 看结果：</b>格子数字代表覆盖频次。</li>
+        </ul>
+        <button class="close-btn" onclick="toggleModal()">我知道了</button>
+    </div>
+</div>
+
+<script>
+    const baseShapes = {
+        'IV':   [[1,1,0,1],
+                 [1,0,1,0]], 
+        'L':    [[1,0],
+                 [1,0],
+                 [1,0],
+                 [1,1]],
+        '折线': [[1,0,0],
+                 [1,0,0],
+                 [1,1,1]],
+        'P':    [[1,1],
+                 [1,1],
+                 [1,0]],
+        'T':    [[1,1,1],
+                 [0,1,0],
+                 [0,1,0]],
+        'U':    [[1,0,1],
+                 [1,1,1]]
+    };
+
+    const shapeRotations = {};
+    for (const [key, matrix] of Object.entries(baseShapes)) {
+        let rotations = [];
+        let current = matrix;
+        let seen = new Set();
+        for (let i = 0; i < 4; i++) {
+            const str = JSON.stringify(current);
+            if (!seen.has(str)) { seen.add(str); rotations.push(current); }
+            current = rotateMatrix(current);
+        }
+        shapeRotations[key] = rotations;
+    }
+
+    function rotateMatrix(matrix) {
+        const rows = matrix.length;
+        const cols = matrix[0].length;
+        const rotated = Array(cols).fill().map(() => Array(rows).fill(0));
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+                rotated[x][rows - 1 - y] = matrix[y][x];
+            }
+        }
+        return rotated;
+    }
+
+    let currentGlobalDirection = 'up'; 
+    let selectedShapes = new Map(); 
+    let currentMode = 'reveal'; 
+    let gridState = Array(5).fill().map(() => Array(5).fill(0));
+    let coverageCounts = Array(5).fill().map(() => Array(5).fill(0));
+
+    const dirSymbols = { 'up': '上', 'down': '下', 'left': '左', 'right': '右', 'random': '随' };
+    const dirNames = { 'up': '向上', 'down': '向下', 'left': '向左', 'right': '向右', 'random': '随机' };
+
+    const shapeLibraryEl = document.getElementById('shapeLibrary');
+    for (const [key, matrix] of Object.entries(baseShapes)) {
+        const card = document.createElement('div');
+        card.className = 'shape-card';
+        card.dataset.shape = key;
+
+        const badge = document.createElement('div');
+        badge.className = 'dir-badge';
+        badge.textContent = '上';
+        
+        const gridDiv = document.createElement('div');
+        gridDiv.className = 'shape-grid';
+        renderShapePreview(gridDiv, matrix);
+
+        const label = document.createElement('div');
+        label.className = 'shape-label';
+        label.textContent = key;
+
+        card.appendChild(badge);
+        card.appendChild(gridDiv);
+        card.appendChild(label);
+        
+        card.onclick = () => toggleShape(key);
+        shapeLibraryEl.appendChild(card);
+    }
+
+    document.getElementById('globalDirPanel').addEventListener('click', (e) => {
+        const btn = e.target.closest('.global-dir-btn');
+        if (!btn) return;
+        applyGlobalDirection(btn.dataset.dir);
+    });
+
+    function renderShapePreview(container, matrix) {
+        container.innerHTML = '';
+        container.style.gridTemplateColumns = `repeat(${matrix[0].length}, 1fr)`;
+        matrix.forEach(row => {
+            row.forEach(cell => {
+                const cellDiv = document.createElement('div');
+                cellDiv.className = `shape-cell ${cell === 1 ? 'filled' : ''}`;
+                container.appendChild(cellDiv);
+            });
+        });
+    }
+
+    function getRotationMatrix(key, dir) {
+        const rotations = shapeRotations[key];
+        let idx = 0;
+        if (dir === 'right') idx = 1;
+        else if (dir === 'down') idx = 2;
+        else if (dir === 'left') idx = 3;
+        idx = idx % rotations.length; 
+        return rotations[idx];
+    }
+
+    function toggleShape(key) {
+        if (selectedShapes.has(key)) {
+            selectedShapes.delete(key);
+        } else {
+            selectedShapes.set(key, currentGlobalDirection);
+        }
+        syncShapeCards();
+        updateStatus();
+        calculateSolutions();
+    }
+
+    function applyGlobalDirection(dir) {
+        currentGlobalDirection = dir;
+
+        document.querySelectorAll('.global-dir-btn').forEach(btn => {
+            if (btn.dataset.dir === dir) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+
+        if (selectedShapes.size > 0) {
+            for (let key of selectedShapes.keys()) {
+                selectedShapes.set(key, dir);
+            }
+            syncShapeCards();
+            updateStatus();
+            calculateSolutions();
+        }
+    }
+
+    function syncShapeCards() {
+        document.querySelectorAll('.shape-card').forEach(card => {
+            const key = card.dataset.shape;
+            const gridDiv = card.querySelector('.shape-grid');
+            const badge = card.querySelector('.dir-badge');
+            
+            if (selectedShapes.has(key)) {
+                card.classList.add('active');
+                const dir = selectedShapes.get(key);
+                badge.textContent = dirSymbols[dir];
+                badge.style.display = 'flex';
+                
+                let previewMatrix = (dir === 'random') ? baseShapes[key] : getRotationMatrix(key, dir);
+                renderShapePreview(gridDiv, previewMatrix);
+            } else {
+                card.classList.remove('active');
+                badge.style.display = 'none';
+                renderShapePreview(gridDiv, baseShapes[key]);
+            }
+        });
+    }
+
+    const mainGridEl = document.getElementById('mainGrid');
+    for (let y = 0; y < 5; y++) {
+        for (let x = 0; x < 5; x++) {
+            const cell = document.createElement('div');
+            cell.className = 'grid-cell';
+            cell.id = `cell-${x}-${y}`;
+            cell.onclick = () => toggleCell(x, y);
+            mainGridEl.appendChild(cell);
+        }
+    }
+
+    function setMode(mode) {
+        currentMode = mode;
+        document.getElementById('btnReveal').className = `mode-btn ${mode === 'reveal' ? 'active' : ''}`;
+        document.getElementById('btnExclude').className = `mode-btn ${mode === 'exclude' ? 'active' : ''}`;
+    }
+
+    function toggleCell(x, y) {
+        let state = gridState[y][x];
+        if (currentMode === 'reveal') state = state === 1 ? 0 : 1; 
+        else state = state === 2 ? 0 : 2; 
+        gridState[y][x] = state;
+        updateStatus();
+        calculateSolutions();
+    }
+
+    function updateStatus() {
+        let shapeStrings = [];
+        for (const [key, dir] of selectedShapes.entries()) {
+            shapeStrings.push(`${key}(${dirNames[dir]})`);
+        }
+        document.getElementById('statusShapes').textContent = shapeStrings.length > 0 ? shapeStrings.join(', ') : '无';
+        
+        let revealCount = 0;
+        gridState.forEach(row => row.forEach(cell => { if (cell === 1) revealCount++; }));
+        document.getElementById('statusReveal').textContent = revealCount;
+    }
+
+    function calculateSolutions() {
+        coverageCounts = Array(5).fill().map(() => Array(5).fill(0));
+        let totalSolutions = 0;
+
+        let globalRevealCount = 0;
+        gridState.forEach(row => row.forEach(cell => { if (cell === 1) globalRevealCount++; }));
+
+        if (selectedShapes.size > 0) {
+            for (const [key, dir] of selectedShapes.entries()) {
+                const matrices = (dir === 'random') ? shapeRotations[key] : [getRotationMatrix(key, dir)];
+                
+                for (const matrix of matrices) {
+                    const h = matrix.length;
+                    const w = matrix[0].length;
+                    
+                    for (let y = 0; y <= 5 - h; y++) {
+                        for (let x = 0; x <= 5 - w; x++) {
+                            if (isPlacementValidSingle(matrix, x, y, globalRevealCount)) {
+                                totalSolutions++;
+                                for (let dy = 0; dy < h; dy++) {
+                                    for (let dx = 0; dx < w; dx++) {
+                                        if (matrix[dy][dx] === 1) {
+                                            coverageCounts[y + dy][x + dx]++;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        document.getElementById('totalSolutions').textContent = totalSolutions > 0 ? totalSolutions + ' 种' : '0 种';
+        renderGrid();
+    }
+
+    function isPlacementValidSingle(matrix, ox, oy, globalRevealCount) {
+        let currentRevealCount = 0;
+        
+        for (let y = 0; y < matrix.length; y++) {
+            for (let x = 0; x < matrix[y].length; x++) {
+                if (matrix[y][x] === 1) {
+                    const gridX = ox + x;
+                    const gridY = oy + y;
+                    
+                    if (gridX >= 5 || gridY >= 5) return false;
+                    if (gridState[gridY][gridX] === 2) return false;
+                    if (gridState[gridY][gridX] === 1) currentRevealCount++;
+                }
+            }
+        }
+        
+        if (globalRevealCount > 0 && currentRevealCount !== globalRevealCount) {
+            return false;
+        }
+        return true;
+    }
+
+    function renderGrid() {
+        for (let y = 0; y < 5; y++) {
+            for (let x = 0; x < 5; x++) {
+                const cell = document.getElementById(`cell-${x}-${y}`);
+                const count = coverageCounts[y][x];
+                const state = gridState[y][x];
+                
+                cell.className = 'grid-cell';
+                cell.textContent = ''; 
+                cell.style.color = ''; 
+
+                if (state === 1) {
+                    cell.classList.add('reveal');
+                    cell.textContent = count > 0 ? count : '-';
+                } else if (state === 2) {
+                    cell.classList.add('exclude');
+                    cell.textContent = '✕';
+                } else {
+                    if (count > 0) {
+                        const freqClass = Math.min(count, 8);
+                        cell.classList.add(`bg-freq-${freqClass}`);
+                        cell.textContent = count;
+                    } else {
+                        cell.textContent = '0';
+                        cell.style.color = '#333'; 
+                    }
+                }
+            }
+        }
+    }
+
+    function toggleModal() {
+        const modal = document.getElementById('helpModal');
+        modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function clearAll() {
+        gridState = Array(5).fill().map(() => Array(5).fill(0));
+        coverageCounts = Array(5).fill().map(() => Array(5).fill(0));
+        selectedShapes.clear();
+        
+        applyGlobalDirection('up');
+
+        document.querySelectorAll('.shape-card').forEach(card => {
+            card.classList.remove('active');
+            card.querySelector('.dir-badge').style.display = 'none';
+            const key = card.dataset.shape;
+            const gridDiv = card.querySelector('.shape-grid');
+            renderShapePreview(gridDiv, baseShapes[key]);
+        });
+        
+        updateStatus();
+        calculateSolutions();
+    }
+</script>
+</body>
+</html>
