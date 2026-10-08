@@ -3,17 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="color-scheme" content="dark">
     <title>藏宝辅助工具</title>
     <style>
         :root {
-            --bg-color: #0a0a0a;
-            --panel-bg: #141414;
-            --border-color: #2a2a2a;
-            --text-main: #ffffff;
-            --text-sub: #aaaaaa; /* 调亮了副标题颜色 */
-            --accent: #00ffcc;   /* 霓虹青 */
-            --reveal: #ffcc00;   /* 翻开橙 */
-            --danger: #d32f2f;   /* 排除红 */
+            --bg-color: #000000;       /* 纯黑背景，在电脑上对比最强 */
+            --panel-bg: #121212;       /* 深灰面板 */
+            --border-color: #333333;
+            --text-main: #ffffff;      /* 纯白文字 */
+            --text-sub: #aaaaaa;
+            
+            /* 颜色配置（全深色底，杜绝浅色背景） */
+            --accent: #00e5ff;         /* 亮青色，清晰锐利 */
+            --reveal-bg: #e65100;      /* 深橙色（翻开） */
+            --exclude-bg: #c62828;     /* 深红色（排除） */
+            
+            /* 概率热力图暗色梯度 */
+            --freq-1: #1a1a1a;
+            --freq-2: #2a2a2a;
+            --freq-3: #3d3d3d;
+            --freq-4: #555555;
+            --freq-5: #004d40;         /* 深青色 */
+            --freq-6: #00695c;         /* 深青色 */
+            --freq-7: #00897b;         /* 深青色 */
+            --freq-8: #4a148c;         /* 深紫色（最高概率） */
         }
 
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
@@ -36,7 +49,7 @@
             border-radius: 16px;
             padding: 15px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
             position: relative;
         }
 
@@ -51,8 +64,9 @@
 
         h1 {
             font-size: 16px; margin: 0; letter-spacing: 2px; font-weight: 900;
-            background: var(--text-main); color: var(--bg-color);
+            background: #222; color: var(--text-main);
             padding: 4px 10px; border-radius: 4px;
+            border: 1px solid #333;
         }
 
         .section-title { font-size: 12px; font-weight: 600; margin: 15px 0 10px 0; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; }
@@ -66,7 +80,7 @@
 
         .shape-card {
             border: 1px solid var(--border-color);
-            background: var(--bg-color);
+            background: #1a1a1a;
             border-radius: 10px;
             padding: 15px 6px;
             cursor: pointer;
@@ -80,8 +94,7 @@
 
         .shape-card.active {
             border-color: var(--accent);
-            background: #1a2a2a;
-            box-shadow: 0 0 12px rgba(0, 255, 204, 0.3);
+            background: #102a30;
         }
 
         .shape-grid {
@@ -99,7 +112,7 @@
             border-radius: 3px; 
         }
 
-        /* 形状方块用青色，不涉及文字 */
+        /* 亮青色方块，在黑色背景下极度清晰 */
         .shape-cell.filled { background: var(--accent); }
         .shape-label { font-size: 13px; font-weight: 700; color: var(--text-sub); }
         .shape-card.active .shape-label { color: var(--accent); }
@@ -121,12 +134,13 @@
             justify-content: center;
             align-items: center;
             z-index: 10;
+            border: 1px solid #444;
         }
 
         .shape-card.active .dir-badge {
             display: flex;
             background: var(--accent);
-            color: #000; /* 青色底配黑色字，绝对清晰 */
+            color: #000000; /* 青底黑字，方向角标很小，黑字更清晰 */
         }
 
         /* 模式切换 */
@@ -134,9 +148,9 @@
         .mode-btn {
             flex: 1; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 14px;
             cursor: pointer; text-align: center; transition: all 0.2s ease;
-            border: 1px solid var(--border-color); background: transparent; color: var(--text-sub);
+            border: 1px solid var(--border-color); background: #1a1a1a; color: var(--text-sub);
         }
-        .mode-btn.active { background: var(--text-main); color: #000; border-color: var(--text-main); }
+        .mode-btn.active { background: #333; color: var(--text-main); border-color: #555; }
 
         /* 主网格 */
         .main-grid {
@@ -148,43 +162,43 @@
             aspect-ratio: 1; border-radius: 6px; display: flex; justify-content: center; align-items: center;
             font-size: 18px; cursor: pointer; user-select: none; transition: all 0.2s ease;
             background: #1a1a1a; border: 1px solid #222; position: relative;
-            font-weight: 900; /* 字体加粗 */
+            font-weight: 900; color: #ffffff;
         }
 
-        /* 1. 翻开状态（亮黄底 + 纯黑字） */
+        /* 1. 翻开状态（深橙底 + 纯白字） */
         .grid-cell.reveal {
-            background: var(--reveal) !important; border-color: #ffaa00 !important;
-            color: #000000 !important; font-size: 20px;
+            background: var(--reveal-bg) !important; 
+            border-color: #ff9800 !important;
+            color: #ffffff !important; 
+            font-size: 20px;
         }
 
-        /* 2. 排除状态（纯红底 + 纯白字） */
+        /* 2. 排除状态（深红底 + 纯白字） */
         .grid-cell.exclude {
-            background: var(--danger) !important; border-color: #ff5252 !important;
-            color: #ffffff !important; font-size: 20px;
+            background: var(--exclude-bg) !important; 
+            border-color: #e53935 !important;
+            color: #ffffff !important; 
+            font-size: 20px;
         }
 
-        /* 3. 频次热力图（绝对高对比度） */
-        /* 深色底 -> 纯白字 */
-        .grid-cell.bg-freq-1 { background: #1a1a1a; color: #ffffff; }
-        .grid-cell.bg-freq-2 { background: #2a2a2a; color: #ffffff; }
-        .grid-cell.bg-freq-3 { background: #3a3a3a; color: #ffffff; }
-        .grid-cell.bg-freq-4 { background: #555555; color: #ffffff; }
-        .grid-cell.bg-freq-5 { background: #777777; color: #ffffff; }
-        
-        /* 亮色底 -> 纯黑字 */
-        .grid-cell.bg-freq-6 { background: #999999; color: #000000; }
-        .grid-cell.bg-freq-7 { background: #cccccc; color: #000000; }
-        
-        /* 霓虹青底 -> 纯黑字（彻底解决你截图里看不清楚的问题） */
+        /* 3. 频次热力图（全深色底，纯白字） */
+        .grid-cell.bg-freq-1 { background: var(--freq-1); }
+        .grid-cell.bg-freq-2 { background: var(--freq-2); }
+        .grid-cell.bg-freq-3 { background: var(--freq-3); }
+        .grid-cell.bg-freq-4 { background: var(--freq-4); }
+        .grid-cell.bg-freq-5 { background: var(--freq-5); }
+        .grid-cell.bg-freq-6 { background: var(--freq-6); }
+        .grid-cell.bg-freq-7 { background: var(--freq-7); }
         .grid-cell.bg-freq-8 { 
-            background: var(--accent); color: #000000; border-color: var(--accent);
+            background: var(--freq-8); 
+            border-color: #6a1b9a;
             font-size: 20px;
         }
 
         .status-area { font-size: 13px; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
         .status-box {
             border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 10px;
-            font-weight: 600; color: var(--text-sub); background: var(--bg-color);
+            font-weight: 600; color: var(--text-sub); background: #1a1a1a;
         }
         .status-box span { color: var(--text-main); font-weight: 800; }
         .full-width { width: 100%; margin-bottom: 15px; text-align: center; }
@@ -194,7 +208,7 @@
             flex: 1; padding: 14px; border-radius: 8px; font-weight: 800; cursor: pointer;
             text-align: center; font-size: 14px; transition: all 0.2s ease; border: 1px solid transparent;
         }
-        .action-btn.primary { background: var(--text-main); color: #000; }
+        .action-btn.primary { background: #333; color: var(--text-main); border-color: #555; }
         .action-btn.secondary { background: transparent; color: var(--text-main); border-color: var(--border-color); }
         .action-btn:active { transform: scale(0.98); }
         .shape-card:active { transform: scale(0.95); }
@@ -235,16 +249,17 @@
             text-align: center; transition: 0.2s;
         }
 
-        /* 选中状态：青色底配黑字 */
+        /* 选中状态：青色底 + 黑字 */
         .sheet-dir-btn.active {
-            background: var(--accent); color: #000; border-color: var(--accent);
+            background: var(--accent); color: #000000; border-color: var(--accent);
+            font-weight: 900;
         }
 
         .sheet-dir-btn:active { transform: scale(0.95); }
 
         .sheet-cancel-btn {
             padding: 14px; width: 100%; background: transparent;
-            color: var(--danger); border: 1px solid var(--danger);
+            color: #ff5252; border: 1px solid #c62828;
             border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer;
             transition: 0.2s; margin-bottom: 8px;
         }
@@ -269,8 +284,8 @@
         .modal-content ul { padding-left: 20px; font-size: 13px; color: #cccccc; line-height: 1.6; margin-bottom: 20px; }
         .modal-content li { margin-bottom: 8px; }
         .modal-content .close-btn {
-            width: 100%; padding: 12px; background: var(--accent); color: #000;
-            border: none; border-radius: 8px; font-weight: 800; font-size: 14px; cursor: pointer;
+            width: 100%; padding: 12px; background: var(--accent); color: #000000;
+            border: none; border-radius: 8px; font-weight: 900; font-size: 14px; cursor: pointer;
         }
     </style>
 </head>
