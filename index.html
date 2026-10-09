@@ -64,7 +64,6 @@
 
         .section-title { font-size: 12px; font-weight: 600; margin: 15px 0 10px 0; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; }
 
-        /* 图形库 */
         .shape-library { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .shape-card {
             border: 1px solid var(--border-color); background: #222222; border-radius: 10px;
@@ -85,7 +84,6 @@
         }
         .shape-card.active .dir-badge { display: flex; background: var(--accent); color: #000000 !important; border-color: #00acc1; }
 
-        /* 模式切换按钮：调暗的蓝色 */
         .mode-buttons { display: flex; gap: 10px; margin-bottom: 15px; }
         .mode-btn {
             flex: 1; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 14px;
@@ -109,36 +107,21 @@
             font-weight: 900; color: #ffffff !important;
         }
 
-        /* 翻开：青色底 + 黑字 */
         .grid-cell.reveal {
             background: var(--reveal-bg) !important; border-color: #00b8d4 !important;
             color: #000000 !important; -webkit-text-fill-color: #000000 !important; font-size: 20px;
         }
 
-        /* 排除：鲜红底 + 白叉 */
         .grid-cell.exclude {
             background: var(--exclude-bg) !important; border-color: #ff5252 !important;
             color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; font-size: 20px;
         }
 
-        /* === 频次热力图（精确色阶） === */
-        .grid-cell.freq-g1 { background: #1b5e20 !important; color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
-        .grid-cell.freq-g2 { background: #2e7d32 !important; color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
-        .grid-cell.freq-g3 { background: #43a047 !important; color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
-        .grid-cell.freq-g4 { background: #66bb6a !important; color: #000000 !important; -webkit-text-fill-color: #000000 !important; }
-        .grid-cell.freq-g5 { background: #81c784 !important; color: #000000 !important; -webkit-text-fill-color: #000000 !important; }
-
-        .grid-cell.freq-y1 { background: #827717 !important; color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
-        .grid-cell.freq-y2 { background: #c0ca33 !important; color: #000000 !important; -webkit-text-fill-color: #000000 !important; }
-        .grid-cell.freq-y3 { background: #fdd835 !important; color: #000000 !important; -webkit-text-fill-color: #000000 !important; }
-        .grid-cell.freq-y4 { background: #ffeb3b !important; color: #000000 !important; -webkit-text-fill-color: #000000 !important; }
-        .grid-cell.freq-y5 { background: #ffee58 !important; color: #000000 !important; -webkit-text-fill-color: #000000 !important; font-size: 20px; }
-
-        .grid-cell.freq-p1 { background: #4a148c !important; color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
-        .grid-cell.freq-p2 { background: #6a1b9a !important; color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
-        .grid-cell.freq-p3 { background: #8e24aa !important; color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
-        .grid-cell.freq-p4 { background: #ab47bc !important; color: #000000 !important; -webkit-text-fill-color: #000000 !important; }
-        .grid-cell.freq-p5 { background: #e040fb !important; color: #000000 !important; -webkit-text-fill-color: #000000 !important; font-size: 20px; }
+        .grid-cell.zero-count {
+            background: #1a1a1a !important;
+            color: #666666 !important;
+            -webkit-text-fill-color: #666666 !important;
+        }
 
         .status-area { font-size: 13px; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
         .status-box {
@@ -148,21 +131,21 @@
         .status-box span { color: #ffffff !important; font-weight: 800; }
         .full-width { width: 100%; margin-bottom: 15px; text-align: center; }
 
-        /* 底部按钮 */
         .action-buttons { display: flex; gap: 10px; }
         .action-btn {
             flex: 1; padding: 14px; border-radius: 8px; font-weight: 800; cursor: pointer;
             text-align: center; font-size: 15px; transition: all 0.2s ease; border: 1px solid transparent;
         }
+        
         .action-btn.primary { background: #ffffff; color: #000000 !important; border-color: #ffffff; box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2); }
         .action-btn.primary:active { background: #dddddd; transform: scale(0.98); }
+        
         .action-btn.secondary { background: #2e7d32; color: #ffffff !important; border-color: #388e3c; box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2); }
         .action-btn.secondary:active { background: #1b5e20; transform: scale(0.98); }
 
         .shape-card:active { transform: scale(0.95); }
         .grid-cell:active { transform: scale(0.9); }
 
-        /* 抽屉与弹窗 */
         .sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: flex-end; z-index: 1000; }
         .bottom-sheet { background: var(--panel-bg); width: 100%; max-width: 420px; border-radius: 20px 20px 0 0; padding: 20px; border-top: 1px solid var(--border-color); animation: slideUp 0.2s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -215,7 +198,6 @@
     </div>
 </div>
 
-<!-- 底部抽屉 -->
 <div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet(event)">
     <div class="bottom-sheet" onclick="event.stopPropagation()">
         <h3>选择 <span id="sheetShapeName">IV</span> 的方向</h3>
@@ -231,7 +213,6 @@
     </div>
 </div>
 
-<!-- 使用说明弹窗 -->
 <div class="modal-overlay" id="helpModal">
     <div class="modal-content">
         <h2>📖 使用说明</h2>
@@ -239,22 +220,24 @@
             <li><b>1. 选图形：</b>点击图形卡片选中，再次点击可修改方向或取消选择。</li>
             <li><b>2. 选方向：</b>点第二次卡片会弹出方向选择，包含向上、向下、向左、向右、随机。</li>
             <li><b>3. 标约束：</b>“翻开”指游戏里开出的正确格子，必须覆盖；“排除”指游戏里开出的错误格子，禁止触碰。</li>
-            <li><b>4. 看结果：</b>格子数字代表被覆盖的频次，数字越大代表该格是正确格的概率越高。</li>
+            <li><b>4. 看结果：</b>格子数字代表被覆盖的频次，数字越大代表该格是正确格的概率越高（数字大的一半显示黄色，小的一半显示绿色）。</li>
         </ul>
         <button class="close-btn" onclick="toggleModal()">我知道了</button>
     </div>
 </div>
 
 <script>
-    // 【新增 V 形】已加回图4对应的 V 形（底宽3格，往上收窄，共5格）
+    // I2+I3 的预览图严格按截图呈现 (3x3 矩阵)
     const baseShapes = {
         'IV':   [[1,1,0,1],[1,0,1,0]], 
         'L':    [[1,0],[1,0],[1,0],[1,1]],
         '折线': [[1,0,0],[1,0,0],[1,1,1]],
-        'P':    [[1,1],[1,1],[1,0]],
+        'I2+I3': [[1,0,1],
+                  [1,0,1],
+                  [0,0,1]], 
         'T':    [[1,1,1],[0,1,0],[0,1,0]],
         'U':    [[1,0,1],[1,1,1]],
-        'V':    [[0,0,1],[0,1,0],[1,1,1]] // 就是这里
+        'V':    [[0,0,1],[0,1,0],[1,1,1]]
     };
 
     const shapeRotations = {};
@@ -273,6 +256,67 @@
         const rotated = Array(cols).fill().map(() => Array(rows).fill(0));
         for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) rotated[x][rows - 1 - y] = matrix[y][x];
         return rotated;
+    }
+
+    // 【核心重构】获取归一化坐标串（去除尺寸和绝对位置的影响，纯拓扑比对）
+    function getNormalizedCoordString(occupied) {
+        let coords = [];
+        let minX = 5, minY = 5;
+        for (let y = 0; y < 5; y++) {
+            for (let x = 0; x < 5; x++) {
+                if (occupied[y][x]) {
+                    coords.push({x, y});
+                    if (x < minX) minX = x;
+                    if (y < minY) minY = y;
+                }
+            }
+        }
+        return coords.map(c => `${c.x - minX},${c.y - minY}`).sort().join('|');
+    }
+
+    // 【核心扩展】把所有已有形状（T, L, 折线, U, V, IV）的旋转形态全部加入禁飞区
+    const forbiddenCoordStrings = new Set();
+    ['T', 'L', '折线', 'U', 'V', 'IV'].forEach(key => {
+        let current = baseShapes[key];
+        let seen = new Set();
+        for (let i = 0; i < 4; i++) {
+            let coords = [];
+            for (let y = 0; y < current.length; y++) {
+                for (let x = 0; x < current[y].length; x++) {
+                    if (current[y][x] === 1) coords.push({x, y});
+                }
+            }
+            if (coords.length > 0) {
+                let minX = Math.min(...coords.map(c => c.x));
+                let minY = Math.min(...coords.map(c => c.y));
+                let str = coords.map(c => `${c.x - minX},${c.y - minY}`).sort().join('|');
+                if (!seen.has(str)) { seen.add(str); forbiddenCoordStrings.add(str); }
+            }
+            current = rotateMatrix(current);
+        }
+    });
+
+    // 【新增】拦截 4 格或 5 格的连续直线
+    function checkLongLine(occupied) {
+        // 检查横向连续 4 或 5
+        for (let y = 0; y < 5; y++) {
+            let count = 0;
+            for (let x = 0; x < 5; x++) {
+                if (occupied[y][x]) count++;
+                else count = 0;
+                if (count >= 4) return true; // 出现4连或5连
+            }
+        }
+        // 检查纵向连续 4 或 5
+        for (let x = 0; x < 5; x++) {
+            let count = 0;
+            for (let y = 0; y < 5; y++) {
+                if (occupied[y][x]) count++;
+                else count = 0;
+                if (count >= 4) return true; // 出现4连或5连
+            }
+        }
+        return false;
     }
 
     let selectedShapes = new Map(); 
@@ -446,18 +490,62 @@
 
         if (selectedShapes.size > 0) {
             for (const [key, dir] of selectedShapes.entries()) {
-                const matrices = (dir === 'random') ? shapeRotations[key] : [getRotationMatrix(key, dir)];
-                
-                for (const matrix of matrices) {
-                    const h = matrix.length, w = matrix[0].length;
-                    for (let y = 0; y <= 5 - h; y++) {
-                        for (let x = 0; x <= 5 - w; x++) {
-                            if (isPlacementValidSingle(matrix, x, y, globalRevealCount)) {
-                                totalSolutions++;
-                                for (let dy = 0; dy < h; dy++) {
-                                    for (let dx = 0; dx < w; dx++) {
-                                        if (matrix[dy][dx] === 1) coverageCounts[y + dy][x + dx]++;
+                const occupied = Array(5).fill().map(() => Array(5).fill(false));
+
+                if (key === 'I2+I3') {
+                    const i2Rotations = [[[1,1]], [[1],[1]]];
+                    const i3Rotations = [[[1,1,1]], [[1],[1],[1]]];
+                    
+                    for (const i2 of i2Rotations) {
+                        for (const i3 of i3Rotations) {
+                            const h2 = i2.length, w2 = i2[0].length;
+                            const h3 = i3.length, w3 = i3[0].length;
+                            
+                            for (let y2 = 0; y2 <= 5 - h2; y2++) {
+                                for (let x2 = 0; x2 <= 5 - w2; x2++) {
+                                    if (!isValidPlacement(i2, x2, y2, occupied)) continue;
+                                    for (let dy = 0; dy < h2; dy++) for (let dx = 0; dx < w2; dx++) if (i2[dy][dx]) occupied[y2+dy][x2+dx] = true;
+                                    
+                                    for (let y3 = 0; y3 <= 5 - h3; y3++) {
+                                        for (let x3 = 0; x3 <= 5 - w3; x3++) {
+                                            if (!isValidPlacement(i3, x3, y3, occupied)) continue;
+                                            for (let dy = 0; dy < h3; dy++) for (let dx = 0; dx < w3; dx++) if (i3[dy][dx]) occupied[y3+dy][x3+dx] = true;
+                                            
+                                            // 检查覆盖条件
+                                            if (isAllRevealedCovered(occupied)) {
+                                                // 限制1：不能拼成4格或5格直线
+                                                if (checkLongLine(occupied)) {
+                                                    for (let dy = 0; dy < h3; dy++) for (let dx = 0; dx < w3; dx++) if (i3[dy][dx]) occupied[y3+dy][x3+dx] = false;
+                                                    continue;
+                                                }
+                                                // 限制2：不能与其他图形（T, L, 折线, U, V, IV）重复
+                                                const occStr = getNormalizedCoordString(occupied);
+                                                if (forbiddenCoordStrings.has(occStr)) {
+                                                    for (let dy = 0; dy < h3; dy++) for (let dx = 0; dx < w3; dx++) if (i3[dy][dx]) occupied[y3+dy][x3+dx] = false;
+                                                    continue;
+                                                }
+                                                
+                                                totalSolutions++;
+                                                for (let y = 0; y < 5; y++) for (let x = 0; x < 5; x++) if (occupied[y][x]) coverageCounts[y][x]++;
+                                            }
+                                            
+                                            for (let dy = 0; dy < h3; dy++) for (let dx = 0; dx < w3; dx++) if (i3[dy][dx]) occupied[y3+dy][x3+dx] = false;
+                                        }
                                     }
+                                    for (let dy = 0; dy < h2; dy++) for (let dx = 0; dx < w2; dx++) if (i2[dy][dx]) occupied[y2+dy][x2+dx] = false;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    const matrices = (dir === 'random') ? shapeRotations[key] : [getRotationMatrix(key, dir)];
+                    for (const matrix of matrices) {
+                        const h = matrix.length, w = matrix[0].length;
+                        for (let y = 0; y <= 5 - h; y++) {
+                            for (let x = 0; x <= 5 - w; x++) {
+                                if (isPlacementValidSingle(matrix, x, y, globalRevealCount)) {
+                                    totalSolutions++;
+                                    for (let dy = 0; dy < h; dy++) for (let dx = 0; dx < w; dx++) if (matrix[dy][dx]) coverageCounts[y+dy][x+dx]++;
                                 }
                             }
                         }
@@ -468,6 +556,29 @@
         
         document.getElementById('totalSolutions').textContent = totalSolutions > 0 ? totalSolutions + ' 种' : '0 种';
         renderGrid();
+    }
+
+    function isValidPlacement(matrix, ox, oy, occupied) {
+        for (let y = 0; y < matrix.length; y++) {
+            for (let x = 0; x < matrix[y].length; x++) {
+                if (matrix[y][x] === 1) {
+                    const gridX = ox + x, gridY = oy + y;
+                    if (gridX >= 5 || gridY >= 5) return false;
+                    if (gridState[gridY][gridX] === 2) return false; 
+                    if (occupied[gridY][gridX]) return false; 
+                }
+            }
+        }
+        return true;
+    }
+
+    function isAllRevealedCovered(occupied) {
+        for (let y = 0; y < 5; y++) {
+            for (let x = 0; x < 5; x++) {
+                if (gridState[y][x] === 1 && !occupied[y][x]) return false;
+            }
+        }
+        return true;
     }
 
     function isPlacementValidSingle(matrix, ox, oy, globalRevealCount) {
@@ -487,12 +598,33 @@
     }
 
     function renderGrid() {
+        let validCounts = [];
+        for (let y = 0; y < 5; y++) {
+            for (let x = 0; x < 5; x++) {
+                if (coverageCounts[y][x] > 0) validCounts.push(coverageCounts[y][x]);
+            }
+        }
+        
+        validCounts.sort((a, b) => b - a);
+        
+        let midValue = 0;
+        let maxCount = validCounts.length > 0 ? validCounts[0] : 0;
+        let minCount = validCounts.length > 0 ? validCounts[validCounts.length - 1] : 0;
+        
+        if (validCounts.length > 0) {
+            midValue = validCounts[Math.floor(validCounts.length / 2)];
+        }
+
         for (let y = 0; y < 5; y++) {
             for (let x = 0; x < 5; x++) {
                 const cell = document.getElementById(`cell-${x}-${y}`);
                 const count = coverageCounts[y][x], state = gridState[y][x];
                 cell.className = 'grid-cell';
                 cell.textContent = ''; 
+                
+                cell.style.backgroundColor = '';
+                cell.style.color = '';
+                cell.style.webkitTextFillColor = '';
 
                 if (state === 1) {
                     cell.classList.add('reveal');
@@ -502,28 +634,32 @@
                     cell.textContent = '✕';
                 } else {
                     if (count > 0) {
-                        let freqClass = '';
-                        if (count >= 1 && count <= 3) freqClass = 'freq-g1';
-                        else if (count >= 4 && count <= 5) freqClass = 'freq-g2';
-                        else if (count >= 6 && count <= 7) freqClass = 'freq-g3';
-                        else if (count >= 8 && count <= 9) freqClass = 'freq-g4';
-                        else if (count === 10) freqClass = 'freq-g5';
+                        let bgColor, textColor;
+
+                        if (count <= midValue) {
+                            if (count <= (minCount + midValue) / 2) {
+                                bgColor = '#1b5e20'; 
+                                textColor = '#ffffff';
+                            } else {
+                                bgColor = '#2e7d32'; 
+                                textColor = '#ffffff';
+                            }
+                        } else {
+                            if (count >= (midValue + maxCount) / 2) {
+                                bgColor = '#ffeb3b'; 
+                                textColor = '#000000';
+                            } else {
+                                bgColor = '#fdd835'; 
+                                textColor = '#000000';
+                            }
+                        }
                         
-                        else if (count >= 11 && count <= 12) freqClass = 'freq-y1';
-                        else if (count >= 13 && count <= 14) freqClass = 'freq-y2';
-                        else if (count >= 15 && count <= 16) freqClass = 'freq-y3';
-                        else if (count >= 17 && count <= 18) freqClass = 'freq-y4';
-                        else if (count >= 19 && count <= 20) freqClass = 'freq-y5';
-                        
-                        else if (count >= 21 && count <= 22) freqClass = 'freq-p1';
-                        else if (count >= 23 && count <= 24) freqClass = 'freq-p2';
-                        else if (count >= 25 && count <= 26) freqClass = 'freq-p3';
-                        else if (count >= 27 && count <= 28) freqClass = 'freq-p4';
-                        else if (count >= 29) freqClass = 'freq-p5';
-                        
-                        cell.classList.add(freqClass);
+                        cell.style.backgroundColor = bgColor;
+                        cell.style.color = textColor;
+                        cell.style.webkitTextFillColor = textColor;
                         cell.textContent = count;
                     } else {
+                        cell.classList.add('zero-count');
                         cell.textContent = '0';
                     }
                 }
