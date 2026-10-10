@@ -221,6 +221,7 @@
             <li><b>2. 选方向：</b>点第二次卡片会弹出方向选择，包含向上、向下、向左、向右、随机。</li>
             <li><b>3. 标约束：</b>“翻开”指游戏里开出的正确格子，必须覆盖；“排除”指游戏里开出的错误格子，禁止触碰。</li>
             <li><b>4. 看结果：</b>格子数字代表被覆盖的频次，数字越大代表该格是正确格的概率越高（数字大的一半显示黄色，小的一半显示绿色）。</li>
+            <li><b>5. 关于随机：</b>随机方向包含所有旋转以及镜像翻转。</li>
         </ul>
         <button class="close-btn" onclick="toggleModal()">我知道了</button>
     </div>
@@ -240,15 +241,45 @@
         'V':    [[0,0,1],[0,1,0],[1,1,1]]
     };
 
+    // 纯旋转库（用于手动方向）
     const shapeRotations = {};
+    // 旋转 + 镜像库（用于随机方向）
+    const shapeRandomRotations = {};
+
     for (const [key, matrix] of Object.entries(baseShapes)) {
-        let rotations = [], current = matrix, seen = new Set();
+        let rotations = [], seen = new Set();
+        let current = matrix;
         for (let i = 0; i < 4; i++) {
             const str = JSON.stringify(current);
             if (!seen.has(str)) { seen.add(str); rotations.push(current); }
             current = rotateMatrix(current);
         }
         shapeRotations[key] = rotations;
+
+        // 生成镜像 + 旋转
+        let randomRotations = [], seenRandom = new Set();
+        let mirrored = mirrorMatrix(matrix);
+        
+        // 原始方向的4个旋转
+        current = matrix;
+        for (let i = 0; i < 4; i++) {
+            const str = JSON.stringify(current);
+            if (!seenRandom.has(str)) { seenRandom.add(str); randomRotations.push(current); }
+            current = rotateMatrix(current);
+        }
+        
+        // 镜像方向的4个旋转
+        current = mirrored;
+        for (let i = 0; i < 4; i++) {
+            const str = JSON.stringify(current);
+            if (!seenRandom.has(str)) { seenRandom.add(str); randomRotations.push(current); }
+            current = rotateMatrix(current);
+        }
+        shapeRandomRotations[key] = randomRotations;
+    }
+
+    function mirrorMatrix(matrix) {
+        return matrix.map(row => [...row].reverse());
     }
 
     function rotateMatrix(matrix) {
@@ -258,7 +289,7 @@
         return rotated;
     }
 
-    // 【核心重构】获取归一化坐标串（去除尺寸和绝对位置的影响，纯拓扑比对）
+    // 预计算去重名单（用于防止 I2+I3 拼成其他图形）
     function getNormalizedCoordString(occupied) {
         let coords = [];
         let minX = 5, minY = 5;
@@ -274,12 +305,9 @@
         return coords.map(c => `${c.x - minX},${c.y - minY}`).sort().join('|');
     }
 
-    // 【核心扩展】把所有已有形状（T, L, 折线, U, V, IV）的旋转形态全部加入禁飞区
     const forbiddenCoordStrings = new Set();
     ['T', 'L', '折线', 'U', 'V', 'IV'].forEach(key => {
-        let current = baseShapes[key];
-        let seen = new Set();
-        for (let i = 0; i < 4; i++) {
+        shapeRandomRotations[key].forEach(current => {
             let coords = [];
             for (let y = 0; y < current.length; y++) {
                 for (let x = 0; x < current[y].length; x++) {
@@ -290,30 +318,26 @@
                 let minX = Math.min(...coords.map(c => c.x));
                 let minY = Math.min(...coords.map(c => c.y));
                 let str = coords.map(c => `${c.x - minX},${c.y - minY}`).sort().join('|');
-                if (!seen.has(str)) { seen.add(str); forbiddenCoordStrings.add(str); }
+                forbiddenCoordStrings.add(str);
             }
-            current = rotateMatrix(current);
-        }
+        });
     });
 
-    // 【新增】拦截 4 格或 5 格的连续直线
     function checkLongLine(occupied) {
-        // 检查横向连续 4 或 5
         for (let y = 0; y < 5; y++) {
             let count = 0;
             for (let x = 0; x < 5; x++) {
                 if (occupied[y][x]) count++;
                 else count = 0;
-                if (count >= 4) return true; // 出现4连或5连
+                if (count >= 4) return true;
             }
         }
-        // 检查纵向连续 4 或 5
         for (let x = 0; x < 5; x++) {
             let count = 0;
             for (let y = 0; y < 5; y++) {
                 if (occupied[y][x]) count++;
                 else count = 0;
-                if (count >= 4) return true; // 出现4连或5连
+                if (count >= 4) return true;
             }
         }
         return false;
@@ -511,14 +535,11 @@
                                             if (!isValidPlacement(i3, x3, y3, occupied)) continue;
                                             for (let dy = 0; dy < h3; dy++) for (let dx = 0; dx < w3; dx++) if (i3[dy][dx]) occupied[y3+dy][x3+dx] = true;
                                             
-                                            // 检查覆盖条件
                                             if (isAllRevealedCovered(occupied)) {
-                                                // 限制1：不能拼成4格或5格直线
                                                 if (checkLongLine(occupied)) {
                                                     for (let dy = 0; dy < h3; dy++) for (let dx = 0; dx < w3; dx++) if (i3[dy][dx]) occupied[y3+dy][x3+dx] = false;
                                                     continue;
                                                 }
-                                                // 限制2：不能与其他图形（T, L, 折线, U, V, IV）重复
                                                 const occStr = getNormalizedCoordString(occupied);
                                                 if (forbiddenCoordStrings.has(occStr)) {
                                                     for (let dy = 0; dy < h3; dy++) for (let dx = 0; dx < w3; dx++) if (i3[dy][dx]) occupied[y3+dy][x3+dx] = false;
@@ -538,7 +559,8 @@
                         }
                     }
                 } else {
-                    const matrices = (dir === 'random') ? shapeRotations[key] : [getRotationMatrix(key, dir)];
+                    // 随机方向使用包含镜像的库，手动方向使用纯旋转库
+                    const matrices = (dir === 'random') ? shapeRandomRotations[key] : [getRotationMatrix(key, dir)];
                     for (const matrix of matrices) {
                         const h = matrix.length, w = matrix[0].length;
                         for (let y = 0; y <= 5 - h; y++) {
