@@ -222,6 +222,7 @@
             <li><b>3. 标约束：</b>“翻开”指游戏里开出的正确格子，必须覆盖；“排除”指游戏里开出的错误格子，禁止触碰。</li>
             <li><b>4. 看结果：</b>格子数字代表被覆盖的频次，数字越大代表该格是正确格的概率越高（数字大的一半显示黄色，小的一半显示绿色）。</li>
             <li><b>5. 关于随机：</b>随机方向包含所有旋转以及镜像翻转。</li>
+            <li><b>6. 记忆功能：</b>数据已自动保存在您的当前设备中，刷新或关闭浏览器后打开会恢复。</li>
         </ul>
         <button class="close-btn" onclick="toggleModal()">我知道了</button>
     </div>
@@ -241,9 +242,7 @@
         'V':    [[0,0,1],[0,1,0],[1,1,1]]
     };
 
-    // 纯旋转库（用于手动方向）
     const shapeRotations = {};
-    // 旋转 + 镜像库（用于随机方向）
     const shapeRandomRotations = {};
 
     for (const [key, matrix] of Object.entries(baseShapes)) {
@@ -256,11 +255,9 @@
         }
         shapeRotations[key] = rotations;
 
-        // 生成镜像 + 旋转
         let randomRotations = [], seenRandom = new Set();
         let mirrored = mirrorMatrix(matrix);
         
-        // 原始方向的4个旋转
         current = matrix;
         for (let i = 0; i < 4; i++) {
             const str = JSON.stringify(current);
@@ -268,7 +265,6 @@
             current = rotateMatrix(current);
         }
         
-        // 镜像方向的4个旋转
         current = mirrored;
         for (let i = 0; i < 4; i++) {
             const str = JSON.stringify(current);
@@ -289,7 +285,6 @@
         return rotated;
     }
 
-    // 预计算去重名单（用于防止 I2+I3 拼成其他图形）
     function getNormalizedCoordString(occupied) {
         let coords = [];
         let minX = 5, minY = 5;
@@ -343,6 +338,7 @@
         return false;
     }
 
+    // === 核心状态 ===
     let selectedShapes = new Map(); 
     let currentMode = 'reveal'; 
     let gridState = Array(5).fill().map(() => Array(5).fill(0));
@@ -352,6 +348,35 @@
     const dirSymbols = { 'up': '上', 'down': '下', 'left': '左', 'right': '右', 'random': '随' };
     const dirNames = { 'up': '向上', 'down': '向下', 'left': '向左', 'right': '向右', 'random': '随机' };
 
+    // === 记忆功能：保存与读取 ===
+    function saveState() {
+        // 使用防抖，避免频繁点击时卡顿
+        clearTimeout(window.saveTimer);
+        window.saveTimer = setTimeout(() => {
+            const state = {
+                selectedShapes: Array.from(selectedShapes.entries()),
+                gridState: gridState
+            };
+            localStorage.setItem('treasureHelperState', JSON.stringify(state));
+        }, 200);
+    }
+
+    function loadState() {
+        const saved = localStorage.getItem('treasureHelperState');
+        if (saved) {
+            try {
+                const state = JSON.parse(saved);
+                if (state.selectedShapes && state.gridState) {
+                    selectedShapes = new Map(state.selectedShapes);
+                    gridState = state.gridState;
+                }
+            } catch (e) {
+                console.error("读取本地记忆失败", e);
+            }
+        }
+    }
+
+    // === 初始化 UI ===
     const shapeLibraryEl = document.getElementById('shapeLibrary');
     for (const [key, matrix] of Object.entries(baseShapes)) {
         const card = document.createElement('div');
@@ -408,6 +433,7 @@
             renderShapePreview(gridDiv, baseShapes[key]); 
             updateStatus();
             calculateSolutions();
+            saveState(); // 保存
         }
     }
 
@@ -450,6 +476,7 @@
         closeSheet();
         updateStatus();
         calculateSolutions();
+        saveState(); // 保存
     });
 
     document.getElementById('btnDeselect').addEventListener('click', () => {
@@ -459,12 +486,14 @@
         
         const card = document.querySelector(`.shape-card[data-shape="${key}"]`);
         card.classList.remove('active');
+        card.querySelector('.dir-badge').style.display = 'none';
         const gridDiv = card.querySelector('.shape-grid');
         renderShapePreview(gridDiv, baseShapes[key]); 
 
         closeSheet();
         updateStatus();
         calculateSolutions();
+        saveState(); // 保存
     });
 
     const mainGridEl = document.getElementById('mainGrid');
@@ -491,6 +520,7 @@
         gridState[y][x] = state;
         updateStatus();
         calculateSolutions();
+        saveState(); // 保存
     }
 
     function updateStatus() {
@@ -559,7 +589,6 @@
                         }
                     }
                 } else {
-                    // 随机方向使用包含镜像的库，手动方向使用纯旋转库
                     const matrices = (dir === 'random') ? shapeRandomRotations[key] : [getRotationMatrix(key, dir)];
                     for (const matrix of matrices) {
                         const h = matrix.length, w = matrix[0].length;
@@ -699,9 +728,11 @@
         coverageCounts = Array(5).fill().map(() => Array(5).fill(0));
         selectedShapes.clear();
         closeSheet();
+        localStorage.removeItem('treasureHelperState'); // 清空本地存储
         
         document.querySelectorAll('.shape-card').forEach(card => {
             card.classList.remove('active');
+            card.querySelector('.dir-badge').style.display = 'none';
             const key = card.dataset.shape;
             const gridDiv = card.querySelector('.shape-grid');
             renderShapePreview(gridDiv, baseShapes[key]);
@@ -710,6 +741,35 @@
         updateStatus();
         calculateSolutions();
     }
+
+    // === 启动时初始化 ===
+    window.onload = function() {
+        loadState(); // 先加载数据
+        
+        // 根据加载的数据恢复 UI 状态
+        document.querySelectorAll('.shape-card').forEach(card => {
+            const key = card.dataset.shape;
+            const badge = card.querySelector('.dir-badge');
+            const gridDiv = card.querySelector('.shape-grid');
+
+            if (selectedShapes.has(key)) {
+                card.classList.add('active');
+                const dir = selectedShapes.get(key);
+                badge.textContent = dirSymbols[dir];
+                badge.style.display = 'flex';
+                
+                let previewMatrix = (dir === 'random') ? baseShapes[key] : getRotationMatrix(key, dir);
+                renderShapePreview(gridDiv, previewMatrix);
+            } else {
+                card.classList.remove('active');
+                badge.style.display = 'none';
+                renderShapePreview(gridDiv, baseShapes[key]);
+            }
+        });
+
+        updateStatus();
+        calculateSolutions();
+    };
 </script>
 </body>
 </html>
